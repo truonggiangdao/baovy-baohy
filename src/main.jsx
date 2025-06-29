@@ -6,7 +6,7 @@ import chuI from './assets/images/i-black.png';
 
 const today = new Date();
 const baovyBirthday = new Date('2021-05-15');
-const baohyBirthday = new Date('2024-09-07');
+const baohyBirthday = new Date('2024-09-06');
 const getAge = (date) => {
   const age = today.getFullYear() - date.getFullYear();
   const m = today.getMonth() - date.getMonth();
@@ -27,35 +27,54 @@ const getBaoVyAgeMonths = () => {
 };
 
 const getBaoVyAgeString = () => {
-  const age = getAge(baovyBirthday);
-
-  const months = getBaoVyAgeMonths();
-  if (months > 0) {
-    return `${age} tuổi ${months} tháng`;
-  }
-  return `${age} tuổi`;
+  return getAgeString(baovyBirthday) || '0 tuổi';
 };
 
-const getWeeksDiff = (date1, date2) => {
-  const diff = date2.getTime() - date1.getTime();
-  const weeks = diff / (1000 * 60 * 60 * 24 * 7);
-  return weeks;
+function getAgeDetails(birthDate) {
+  let years = today.getFullYear() - birthDate.getFullYear();
+  let months = today.getMonth() - birthDate.getMonth();
+  let days = today.getDate() - birthDate.getDate();
+
+  if (days < 0) {
+    // Mượn 1 tháng trước đó
+    months--;
+    const previousMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+    days += previousMonth.getDate(); // Số ngày của tháng trước
+  }
+
+  if (months < 0) {
+    years--;
+    months += 12;
+  }
+
+  // Tính số tuần và ngày lẻ còn lại
+  const totalDays = Math.floor((today - birthDate) / (1000 * 60 * 60 * 24));
+  const weeks = Math.floor((totalDays % 30.4375) / 7); // trung bình 1 tháng = 30.4375 ngày
+  const remainingDays = totalDays % 7;
+
+  return { years, months, weeks, days: remainingDays };
+}
+
+const getAgeString = (birthDate) => {
+  const { years, months, weeks, days } = getAgeDetails(birthDate);
+  const age = [];
+  if (years > 0) {
+    age.push(`${years} tuổi`);
+  }
+  if (months > 0) {
+    age.push(`${months} tháng`);
+  }
+  if (weeks > 0) {
+    age.push(`${weeks} tuần`);
+  }
+  if (years < 1 && days > 0) {
+    age.push(`${days} ngày`);
+  }
+  return `${age.join(' ').trim()}`;
 };
 
 const getBaoHyAgeString = () => {
-  const weeks = getWeeksDiff(baohyBirthday, today);
-
-  const roundWeeks = Math.floor(Math.abs(weeks));
-  const roundDays = Math.floor((Math.abs(weeks) - roundWeeks) * 7);
-
-  let dateString = `${roundWeeks} tuần`;
-  if (roundDays > 0) {
-    dateString = `${dateString} ${roundDays} ngày`;
-  }
-  if (weeks < 0) {
-    dateString = `Dự sinh: ${dateString}`;
-  }
-  return dateString;
+  return getAgeString(baohyBirthday) || '0 tuổi';
 };
 
 ReactDOM.createRoot(document.getElementById('root')).render(
@@ -95,7 +114,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <div className='info-baohy'>
             <h4 className='mb-1 text-center'>Đào Kỳ Bảo Hy</h4>
             <p className='info-detail text-center'>
-              07/09/2024 (<span>{getBaoHyAgeString()}</span>)
+              06/09/2024 (<span>{getBaoHyAgeString()}</span>)
             </p>
           </div>
         </div>
