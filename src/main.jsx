@@ -99,7 +99,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
             fontSize: '13px',
           }}
         >
-          20/04/2024
+          Sun, Jun 29, 2025
         </div>
         <div id='info' className='info'>
           <div className='img-container text-center mb-2'>
